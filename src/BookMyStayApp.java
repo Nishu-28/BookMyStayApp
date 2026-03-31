@@ -525,14 +525,90 @@ class AddOnServiceManager {
 }
 
 /**
+ * ============================================================
+ * CLASS - BookingHistory
+ * ============================================================
+ *
+ * Use Case 8: Booking History & Reporting
+ *
+ * Description:
+ * This class maintains a record of
+ * confirmed reservations.
+ *
+ * It provides ordered storage for
+ * historical and reporting purposes.
+ *
+ * @version 8.0
+ */
+class BookingHistory {
+
+    /**
+     * List that stores confirmed reservations.
+     */
+    private List<Reservation> confirmedReservations;
+
+    /**
+     * Initializes an empty booking history.
+     */
+    public BookingHistory() { confirmedReservations = new ArrayList<>(); }
+
+    /**
+     * Adds a confirmed reservation
+     * to booking history.
+     *
+     * @param reservation confirmed booking
+     */
+    public void addReservation(Reservation reservation) { confirmedReservations.add(reservation); }
+
+    /**
+     * Returns all confirmed reservations.
+     *
+     * @return list of reservations
+     */
+    public List<Reservation> getConfirmedReservations() { return confirmedReservations; }
+}
+
+/**
+ * ============================================================
+ * CLASS - BookingReportService
+ * ============================================================
+ *
+ * Use Case 8: Booking History & Reporting
+ *
+ * Description:
+ * This class generates reports
+ * from booking history data.
+ *
+ * Reporting logic is separated
+ * from data storage.
+ *
+ * @version 8.0
+ */
+class BookingReportService {
+
+    /**
+     * Displays a summary report
+     * of all confirmed bookings.
+     *
+     * @param history booking history
+     */
+    public void generateReport(BookingHistory history) {
+        System.out.println("Booking History Report");
+        for (Reservation reservation : history.getConfirmedReservations()) {
+            System.out.println("Guest: " + reservation.getGuestName() + ", Room Type: " + reservation.getRoomType());
+        }
+    }
+}
+
+/**
  * BookMyStayApp
  *
  * <p>This class serves as the entry point for the Hotel Booking Management System.
- * It demonstrates add-on service selection and cost aggregation
+ * It demonstrates booking history tracking and report generation
  * for confirmed reservations.</p>
  *
  * @author Nishanth
- * @version 7.1
+ * @version 8.1
  */
 public class BookMyStayApp {
 
@@ -544,24 +620,23 @@ public class BookMyStayApp {
     public static void main(String[] args) {
 
         // Display application header
-        System.out.println("Add-On Service Selection");
+        System.out.println("Booking History and Reporting");
+        System.out.println();
 
-        // Initialize add-on service manager
-        AddOnServiceManager serviceManager = new AddOnServiceManager();
+        // Initialize booking history
+        BookingHistory history = new BookingHistory();
 
-        // Create add-on services
-        AddOnService breakfast = new AddOnService("Breakfast", 500.0);
-        AddOnService spa = new AddOnService("Spa", 700.0);
-        AddOnService airportPickup = new AddOnService("Airport Pickup", 300.0);
+        // Create and add confirmed reservations
+        Reservation r1 = new Reservation("Abhi", "Single");
+        Reservation r2 = new Reservation("Subha", "Double");
+        Reservation r3 = new Reservation("Vanmathi", "Suite");
 
-        // Attach services to reservation
-        String reservationId = "Single-1";
-        serviceManager.addService(reservationId, breakfast);
-        serviceManager.addService(reservationId, spa);
-        serviceManager.addService(reservationId, airportPickup);
+        history.addReservation(r1);
+        history.addReservation(r2);
+        history.addReservation(r3);
 
-        // Display total add-on cost
-        System.out.println("Reservation ID: " + reservationId);
-        System.out.println("Total Add-On Cost: " + serviceManager.calculateTotalServiceCost(reservationId));
+        // Generate booking report
+        BookingReportService reportService = new BookingReportService();
+        reportService.generateReport(history);
     }
 }
