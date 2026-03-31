@@ -174,14 +174,81 @@ class RoomInventory {
 }
 
 /**
+ * ============================================================
+ * CLASS - RoomSearchService
+ * ============================================================
+ *
+ * Use Case 4: Room Search & Availability Check
+ *
+ * Description:
+ * This class provides search functionality
+ * for guests to view available rooms.
+ *
+ * It reads room availability from inventory
+ * and room details from Room objects.
+ *
+ * No inventory mutation or booking logic
+ * is performed in this class.
+ *
+ * @version 4.0
+ */
+class RoomSearchService {
+
+    /**
+     * Displays available rooms along with
+     * their details and pricing.
+     *
+     * This method performs read-only access
+     * to inventory and room data.
+     *
+     * @param inventory centralized room inventory
+     * @param singleRoom single room definition
+     * @param doubleRoom double room definition
+     * @param suiteRoom suite room definition
+     */
+    public void searchAvailableRooms(
+            RoomInventory inventory,
+            Room singleRoom,
+            Room doubleRoom,
+            Room suiteRoom) {
+
+        Map<String, Integer> availability = inventory.getRoomAvailability();
+
+        // Check and display Single Room availability
+        if (availability.get("Single") > 0) {
+            System.out.println("Single Room:");
+            singleRoom.displayRoomDetails();
+            System.out.println("Available: " + availability.get("Single"));
+            System.out.println();
+        }
+
+        // Check and display Double Room availability
+        if (availability.get("Double") > 0) {
+            System.out.println("Double Room:");
+            doubleRoom.displayRoomDetails();
+            System.out.println("Available: " + availability.get("Double"));
+            System.out.println();
+        }
+
+        // Check and display Suite Room availability
+        if (availability.get("Suite") > 0) {
+            System.out.println("Suite Room:");
+            suiteRoom.displayRoomDetails();
+            System.out.println("Available: " + availability.get("Suite"));
+            System.out.println();
+        }
+    }
+}
+
+/**
  * BookMyStayApp
  *
  * <p>This class serves as the entry point for the Hotel Booking Management System.
- * It demonstrates centralized inventory management using HashMap
- * for consistent room availability tracking.</p>
+ * It demonstrates room search and availability checking
+ * with read-only access to inventory data.</p>
  *
  * @author Nishanth
- * @version 3.1
+ * @version 4.1
  */
 public class BookMyStayApp {
 
@@ -197,23 +264,12 @@ public class BookMyStayApp {
         Room suiteRoom = new SuiteRoom();
 
         RoomInventory inventory = new RoomInventory();
-        Map<String, Integer> availability = inventory.getRoomAvailability();
 
-        System.out.println("Hotel Room Inventory Status");
+        RoomSearchService searchService = new RoomSearchService();
 
+        System.out.println("Room Search");
         System.out.println();
-        System.out.println("Single Room:");
-        singleRoom.displayRoomDetails();
-        System.out.println("Available Rooms: " + availability.get("Single"));
 
-        System.out.println();
-        System.out.println("Double Room:");
-        doubleRoom.displayRoomDetails();
-        System.out.println("Available Rooms: " + availability.get("Double"));
-
-        System.out.println();
-        System.out.println("Suite Room:");
-        suiteRoom.displayRoomDetails();
-        System.out.println("Available Rooms: " + availability.get("Suite"));
+        searchService.searchAvailableRooms(inventory, singleRoom, doubleRoom, suiteRoom);
     }
 }
