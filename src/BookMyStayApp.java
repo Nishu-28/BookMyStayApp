@@ -1,6 +1,8 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -412,14 +414,125 @@ class RoomAllocationService {
 }
 
 /**
+ * ============================================================
+ * CLASS - AddOnService
+ * ============================================================
+ *
+ * Use Case 7: Add-On Service Selection
+ *
+ * Description:
+ * This class represents an optional service
+ * that can be added to a confirmed reservation.
+ *
+ * Examples:
+ * - Breakfast
+ * - Spa
+ * - Airport Pickup
+ *
+ * @version 7.0
+ */
+class AddOnService {
+
+    /**
+     * Name of the service.
+     */
+    private String serviceName;
+
+    /**
+     * Cost of the service.
+     */
+    private double cost;
+
+    /**
+     * Creates a new add-on service.
+     *
+     * @param serviceName name of the service
+     * @param cost cost of the service
+     */
+    public AddOnService(String serviceName, double cost) {
+        this.serviceName = serviceName;
+        this.cost = cost;
+    }
+
+    /**
+     * @return service name
+     */
+    public String getServiceName() { return serviceName; }
+
+    /**
+     * @return service cost
+     */
+    public double getCost() { return cost; }
+}
+
+/**
+ * ============================================================
+ * CLASS - AddOnServiceManager
+ * ============================================================
+ *
+ * Use Case 7: Add-On Service Selection
+ *
+ * Description:
+ * This class manages optional services
+ * associated with confirmed reservations.
+ *
+ * It supports attaching multiple services
+ * to a single reservation.
+ *
+ * @version 7.0
+ */
+class AddOnServiceManager {
+
+    /**
+     * Maps reservation ID to selected services.
+     *
+     * Key   -> Reservation ID
+     * Value -> List of selected services
+     */
+    private Map<String, List<AddOnService>> servicesByReservation;
+
+    /**
+     * Initializes the service manager.
+     */
+    public AddOnServiceManager() { servicesByReservation = new HashMap<>(); }
+
+    /**
+     * Attaches a service to a reservation.
+     *
+     * @param reservationId confirmed reservation ID
+     * @param service add-on service
+     */
+    public void addService(String reservationId, AddOnService service) {
+        servicesByReservation.computeIfAbsent(reservationId, k -> new ArrayList<>()).add(service);
+    }
+
+    /**
+     * Calculates total add-on cost
+     * for a reservation.
+     *
+     * @param reservationId reservation ID
+     * @return total service cost
+     */
+    public double calculateTotalServiceCost(String reservationId) {
+        List<AddOnService> services = servicesByReservation.get(reservationId);
+        if (services == null) return 0.0;
+        double total = 0.0;
+        for (AddOnService service : services) {
+            total += service.getCost();
+        }
+        return total;
+    }
+}
+
+/**
  * BookMyStayApp
  *
  * <p>This class serves as the entry point for the Hotel Booking Management System.
- * It demonstrates reservation confirmation and room allocation
- * with unique room ID assignment and inventory synchronization.</p>
+ * It demonstrates add-on service selection and cost aggregation
+ * for confirmed reservations.</p>
  *
  * @author Nishanth
- * @version 6.1
+ * @version 7.1
  */
 public class BookMyStayApp {
 
@@ -431,27 +544,24 @@ public class BookMyStayApp {
     public static void main(String[] args) {
 
         // Display application header
-        System.out.println("Room Allocation Processing");
+        System.out.println("Add-On Service Selection");
 
-        // Initialize inventory and services
-        RoomInventory inventory = new RoomInventory();
-        BookingRequestQueue bookingQueue = new BookingRequestQueue();
-        RoomAllocationService allocationService = new RoomAllocationService();
+        // Initialize add-on service manager
+        AddOnServiceManager serviceManager = new AddOnServiceManager();
 
-        // Create booking requests
-        Reservation r1 = new Reservation("Abhi", "Single");
-        Reservation r2 = new Reservation("Subha", "Single");
-        Reservation r3 = new Reservation("Vanmathi", "Suite");
+        // Create add-on services
+        AddOnService breakfast = new AddOnService("Breakfast", 500.0);
+        AddOnService spa = new AddOnService("Spa", 700.0);
+        AddOnService airportPickup = new AddOnService("Airport Pickup", 300.0);
 
-        // Add requests to the queue
-        bookingQueue.addRequest(r1);
-        bookingQueue.addRequest(r2);
-        bookingQueue.addRequest(r3);
+        // Attach services to reservation
+        String reservationId = "Single-1";
+        serviceManager.addService(reservationId, breakfast);
+        serviceManager.addService(reservationId, spa);
+        serviceManager.addService(reservationId, airportPickup);
 
-        // Process booking requests in FIFO order
-        while (bookingQueue.hasPendingRequests()) {
-            Reservation next = bookingQueue.getNextRequest();
-            allocationService.allocateRoom(next, inventory);
-        }
+        // Display total add-on cost
+        System.out.println("Reservation ID: " + reservationId);
+        System.out.println("Total Add-On Cost: " + serviceManager.calculateTotalServiceCost(reservationId));
     }
 }
